@@ -16,6 +16,11 @@ cd docker
 docker-compose up -d
 ```
 
+### Build all components
+```
+mvn clean install
+```
+
 ## Technology Stack
 - Language: Java
 - Build Tool: Maven (pom.xml files)
