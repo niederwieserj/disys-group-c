@@ -5,4 +5,4 @@
 -- \connect postgres;
 -- GRANT CONNECT ON DATABASE postgres TO Read_Only_User;
 -- GRANT USAGE ON SCHEMA public TO Read_Only_User;
---GRANT SELECT ON ALL TABLES IN SCHEMA public TO Read_Only_User;
+-- GRANT SELECT ON ALL TABLES IN SCHEMA public TO Read_Only_User;

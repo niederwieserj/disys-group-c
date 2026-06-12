@@ -1,8 +1,11 @@
 package com.energy.community.restapi.controller;
 
 import com.energy.community.restapi.dto.EnergyDto;
+import com.energy.community.restapi.dto.PercentageDto;
 import com.energy.community.restapi.entity.EnergyEntity;
+import com.energy.community.restapi.entity.PercentageEntity;
 import com.energy.community.restapi.repository.EnergyRepository;
+import com.energy.community.restapi.repository.PercentageRepository;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +18,11 @@ import java.util.List;
 public class EnergyController {
 
     private final EnergyRepository energyRepository;
+    private final PercentageRepository percentageRepository;
 
-    public EnergyController(EnergyRepository energyRepository) {
+    public EnergyController(EnergyRepository energyRepository, PercentageRepository percentageRepository) {
         this.energyRepository = energyRepository;
+        this.percentageRepository = percentageRepository;
     }
 
     @GetMapping("/energy/historical")
@@ -29,26 +34,41 @@ public class EnergyController {
     }
 
     @GetMapping("/energy/current")
-    public List<EnergyDto> getEnergyCurrent() {
+    public List<PercentageDto> getEnergyCurrent() {
         LocalDateTime hourStart = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime hourEnd = LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.HOURS);
-        return filterEnergyByHour(hourStart, hourEnd);
+        return filterPercentageByHour(hourStart, hourEnd);
+    }
+
+    private List<PercentageDto> filterPercentageByHour(LocalDateTime start, LocalDateTime end) {
+        return this.percentageRepository.findPercentageEntitiesByHourBetween(start, end)
+                .stream()
+                .map(this::mapPercentageEntityToDto)
+                .toList();
     }
 
     private List<EnergyDto> filterEnergyByHour(LocalDateTime start, LocalDateTime end) {
         return this.energyRepository.findEnergyEntitiesByHourBetween(start, end)
                 .stream()
-                .map(this::mapEntityToDto)
+                .map(this::mapEnergyEntityToDto)
                 .toList();
     }
 
-    private EnergyDto mapEntityToDto(EnergyEntity entity) {
+    private PercentageDto mapPercentageEntityToDto(PercentageEntity entity) {
+        return new PercentageDto(
+                entity.getHour(),
+                entity.getCommunityDepleted(),
+                entity.getGridPortion()
+        );
+    }
+
+    private EnergyDto mapEnergyEntityToDto(EnergyEntity entity) {
         return new EnergyDto(
                 entity.getId(),
                 entity.getHour(),
-                entity.getCommunity_produced(),
-                entity.getCommunity_used(),
-                entity.getGrid_used()
+                entity.getCommunityProduced(),
+                entity.getCommunityUsed(),
+                entity.getGridUsed()
         );
     }
 }

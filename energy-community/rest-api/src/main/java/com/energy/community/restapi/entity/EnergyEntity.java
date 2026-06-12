@@ -15,13 +15,13 @@ public class EnergyEntity {
     private LocalDateTime hour;
 
     @Column(name="community_produced")
-    private double community_produced;
+    private double communityProduced;
 
     @Column(name="community_used")
-    private double community_used;
+    private double communityUsed;
 
     @Column(name="grid_used")
-    private double grid_used;
+    private double gridUsed;
 
     public int getId() {
         return id;
@@ -39,27 +39,27 @@ public class EnergyEntity {
         this.hour = hour;
     }
 
-    public double getCommunity_produced() {
-        return community_produced;
+    public double getCommunityProduced() {
+        return communityProduced;
     }
 
-    public void setCommunity_produced(double community_produced) {
-        this.community_produced = community_produced;
+    public void setCommunityProduced(double community_produced) {
+        this.communityProduced = community_produced;
     }
 
-    public double getCommunity_used() {
-        return community_used;
+    public double getCommunityUsed() {
+        return communityUsed;
     }
 
-    public void setCommunity_used(double community_used) {
-        this.community_used = community_used;
+    public void setCommunityUsed(double community_used) {
+        this.communityUsed = community_used;
     }
 
-    public double getGrid_used() {
-        return grid_used;
+    public double getGridUsed() {
+        return gridUsed;
     }
 
-    public void setGrid_used(double grid_used) {
-        this.grid_used = grid_used;
+    public void setGridUsed(double grid_used) {
+        this.gridUsed = grid_used;
     }
 }
