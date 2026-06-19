@@ -5,6 +5,7 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -33,9 +34,9 @@
       </Label>
     </top>
     <right>
-      <VBox alignment="TOP_RIGHT" prefHeight="118.0" prefWidth="195.0" style="border: green;" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_RIGHT" prefHeight="237.0" prefWidth="239.0" style="border: green;" BorderPane.alignment="CENTER">
         <children>
-          <VBox prefHeight="150.0" prefWidth="218.0">
+          <VBox prefHeight="150.0" prefWidth="231.0">
             <children>
               <Text fx:id="community_pool_pc_value" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="203.9830722808838">
                 <VBox.margin>
@@ -58,23 +59,37 @@
           <Separator prefWidth="200.0" style="-fx-background-color: #6a994e;" />
           <VBox alignment="TOP_RIGHT" prefHeight="157.0" prefWidth="195.0">
             <children>
-              <DatePicker fx:id="start_date_picker" style="-fx-border-insets: 5px; -fx-padding: 5px; -fx-background-insets: 5px; -fx-background-color: #f2e8cf;">
-                <VBox.margin>
-                  <Insets top="5.0" />
-                </VBox.margin>
-              </DatePicker>
-              <DatePicker fx:id="end_date_picker" style="-fx-padding: 5px; -fx-border-insets: 5px; -fx-background-insets: 5px; -fx-background-color: #f2e8cf;" />
+                     <HBox prefHeight="39.0" prefWidth="214.0">
+                        <children>
+                    <DatePicker fx:id="start_date_picker" style="-fx-border-insets: 5px; -fx-padding: 5px; -fx-background-insets: 5px; -fx-background-color: #f2e8cf;" />
+                           <TextField fx:id="start_time" prefHeight="25.0" prefWidth="70.0">
+                              <HBox.margin>
+                                 <Insets bottom="5.0" right="5.0" top="5.0" />
+                              </HBox.margin>
+                           </TextField>
+                        </children>
+                     </HBox>
+                     <HBox prefHeight="34.0" prefWidth="214.0">
+                        <children>
+                    <DatePicker fx:id="end_date_picker" style="-fx-padding: 5px; -fx-border-insets: 5px; -fx-background-insets: 5px; -fx-background-color: #f2e8cf;" />
+                           <TextField fx:id="end_time" prefHeight="25.0" prefWidth="70.0">
+                              <HBox.margin>
+                                 <Insets bottom="5.0" right="5.0" top="5.0" />
+                              </HBox.margin>
+                           </TextField>
+                        </children>
+                     </HBox>
             </children>
           </VBox>
         </children>
       </VBox>
     </right>
     <left>
-      <VBox prefHeight="178.0" prefWidth="227.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="237.0" prefWidth="194.0" BorderPane.alignment="CENTER">
         <children>
           <VBox prefHeight="168.0" prefWidth="227.0">
             <children>
-              <VBox minHeight="-Infinity" prefHeight="113.0" prefWidth="227.0">
+              <VBox minHeight="-Infinity" prefHeight="113.0" prefWidth="207.0">
                 <children>
                   <Label style="-fx-label-padding: 5px;" text="Community Pool: ">
                     <font>
@@ -102,12 +117,12 @@
               <Separator prefHeight="10.0" prefWidth="227.0" style="-fx-background-color: #6a994e;" />
               <VBox minHeight="-Infinity" prefHeight="111.0" prefWidth="227.0">
                 <children>
-                  <Label style="-fx-label-padding: 5px;" text="Start date">
+                  <Label style="-fx-label-padding: 5px;" text="Start date and time">
                     <font>
                       <Font size="14.0" />
                     </font>
                   </Label>
-                  <Label style="-fx-label-padding: 5px;" text="End date">
+                  <Label style="-fx-label-padding: 5px;" text="End date and time">
                     <font>
                       <Font size="14.0" />
                     </font>
