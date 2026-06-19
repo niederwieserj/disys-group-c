@@ -24,16 +24,21 @@ public class EnergyController implements Initializable{
 
     private EnergyCommunityModel model;
 
+    // percentages of community pool usage and grid portion
+    @FXML
+    Text community_pool_pc_value;
+    @FXML
+    Text grid_portion_pc_value;
+
+    // community production/usage and grid usage in kWh
     @FXML
     Text community_produced_kWh_value;
     @FXML
     Text community_used_kWh_value;
     @FXML
     Text grid_used_kWh_value;
-    @FXML
-    Text community_pool_pc_value;
-    @FXML
-    Text grid_portion_pc_value;
+
+
 
     // date and time input fields
     @FXML
