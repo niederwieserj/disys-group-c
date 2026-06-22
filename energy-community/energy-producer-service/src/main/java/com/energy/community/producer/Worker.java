@@ -17,6 +17,6 @@ public class Worker {
     @Scheduled(fixedRate = 10000)
     public void Work() {
         ProducedKwhDto producedKwhDto = new ProducedKwhDto("PRODUCER", "COMMUNITY", 0.0023, LocalDateTime.now());
-        rabbitTemplate.convertAndSend(RabbitMqConfig.PRODUCED_KWH_QUEUE, producedKwhDto);
+        rabbitTemplate.convertAndSend(RabbitMqConfig.PRODUCED_KWH_QUEUE, "test");
     }
 }
