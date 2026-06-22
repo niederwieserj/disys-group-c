@@ -1,6 +1,5 @@
 package com.energy.community.producer;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -10,8 +9,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Map;
 
 public class TestApi {
     public static void main(String[] args) {
