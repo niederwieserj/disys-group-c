@@ -19,7 +19,6 @@
         <module>energy-user-service</module>
         <module>usage-service</module>
         <module>current-percentage-service</module>
-        <module>common</module>
         <module>gui-app</module>
         <module>rest-api</module>
     </modules>
