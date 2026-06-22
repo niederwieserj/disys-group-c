@@ -5,10 +5,11 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.databind.json.JsonMapper;
 
+@Configuration
 public class RabbitMQConfig {
     public static final String USAGE_UPDATE_QUEUE = "Usage_Update_Queue";
     public static final String RABBITMQ_USERNAME = "guest";
@@ -32,6 +33,12 @@ public class RabbitMQConfig {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
         rabbitTemplate.setMessageConverter(messageConverter);
         return rabbitTemplate;
+    }
+
+    @Bean
+    public JacksonJsonMessageConverter jsonMessageConverter() {
+        JsonMapper jsonMapper = JsonMapper.builder().build();
+        return new JacksonJsonMessageConverter(jsonMapper);
     }
 
 }

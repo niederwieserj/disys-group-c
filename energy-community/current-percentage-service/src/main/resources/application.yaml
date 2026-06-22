@@ -1,0 +1,19 @@
+server:
+    port: 5672
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/disysuser
+    username: disysuser
+    password: disyspw
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
