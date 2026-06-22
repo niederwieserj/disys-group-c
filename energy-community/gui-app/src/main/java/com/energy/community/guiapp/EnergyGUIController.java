@@ -1,13 +1,15 @@
 package com.energy.community.guiapp;
 
+import com.energy.community.guiapp.dto.EnergyDto;
+import com.energy.community.guiapp.dto.PercentageDto;
 import com.energy.community.guiapp.presentationModel.EnergyCommunityModel;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.fxml.Initializable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
@@ -25,7 +27,7 @@ public class EnergyGUIController implements Initializable{
     private EnergyCommunityModel model;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     // percentages of community pool usage and grid portion
     @FXML
@@ -161,17 +163,13 @@ public class EnergyGUIController implements Initializable{
     private void updatePercentageUI(String jsonResponse) {
 
         try {
-            JsonNode root = objectMapper.readTree(jsonResponse);
+            PercentageDto[] data = objectMapper.readValue(jsonResponse, PercentageDto[].class);
 
+            if (data != null && data.length > 0) {
+                PercentageDto latestData = data[0];
 
-            if (root.isArray() && !root.isEmpty()) {
-
-                JsonNode latestData = root.get(0);
-                double communityDepleted = latestData.path("communityDepleted").asDouble(0.0);
-                double gridPortion = latestData.path("gridPortion").asDouble(0.0);
-
-                community_pool_pc_value.setText(String.format("%.2f %%", communityDepleted));
-                grid_portion_pc_value.setText(String.format("%.2f %%", gridPortion));
+                community_pool_pc_value.setText(String.format("%.2f %%", latestData.community_depleted()));
+                grid_portion_pc_value.setText(String.format("%.2f %%", latestData.grid_portion()));
             }
         } catch (Exception e) {
             System.err.println("Failed to parse percentage JSON: " + e.getMessage());
@@ -188,17 +186,17 @@ public class EnergyGUIController implements Initializable{
 
     private void updateHistoricalUI(String jsonResponse) {
         try {
-            JsonNode root = objectMapper.readTree(jsonResponse);
+            EnergyDto[] data = objectMapper.readValue(jsonResponse, EnergyDto[].class);
 
-            if (root.isArray()) {
+            if (data != null) {
                 double totalProduced = 0.0;
                 double totalUsed = 0.0;
                 double totalGrid = 0.0;
 
-                for (JsonNode node : root) {
-                    totalProduced += node.path("communityProduced").asDouble(0.0);
-                    totalUsed += node.path("communityUsed").asDouble(0.0);
-                    totalGrid += node.path("gridUsed").asDouble(0.0);
+                for (EnergyDto node : data) {
+                    totalProduced += node.community_produced();
+                    totalUsed += node.community_used();
+                    totalGrid += node.grid_used();
                 }
 
                 community_produced_kWh_value.setText(String.format("%.2f kWh", totalProduced));
