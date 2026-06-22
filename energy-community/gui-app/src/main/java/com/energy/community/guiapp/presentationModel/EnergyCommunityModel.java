@@ -1,15 +1,12 @@
 package com.energy.community.guiapp.presentationModel;
 
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
-
 
 public class EnergyCommunityModel {
 
     public EnergyCommunityModel() {
-        // Listener mit Lambda
+        // Listener with lambda
         bool.addListener((o, oldVal, newVal) -> {
             boolToVisibility.invalidate();
         });
@@ -21,7 +18,6 @@ public class EnergyCommunityModel {
     private BooleanBinding boolToVisibility = new BooleanBinding() {
         @Override
         protected boolean computeValue() {
-            // hier noch was machen wie im SimpleBindings bsp
             return bool.get();
         }
     };

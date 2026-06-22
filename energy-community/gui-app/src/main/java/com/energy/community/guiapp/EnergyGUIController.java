@@ -120,20 +120,22 @@ public class EnergyGUIController implements Initializable{
         getCurrentPercentageData();
     }
 
+    // GET current percentages
     private void getCurrentPercentageData() {
         String url = "http://localhost:8080/energy/current";
         String responseBody = sendGetRequest(url);
-        System.out.println("im get percentage VOR !null if");
+
         if (responseBody != null) {
-            System.out.println("im get percentage !null if");
+
             updatePercentageUI(responseBody);
         } else {
-            System.out.println("im get percentage else");
+
             community_pool_pc_value.setText("No data found!");
             grid_used_kWh_value.setText("No data found!");
         }
     }
 
+    // GET historical energy data
     private void getHistoricalEnergyData() {
         String startIso = getFormattedDateTime(start_date_picker, start_time, true);
         String endIso = getFormattedDateTime(end_date_picker, end_time, false);
@@ -159,7 +161,7 @@ public class EnergyGUIController implements Initializable{
         return LocalDateTime.of(date, time).toString();
     }
 
-    // prozentwerte für community pool (verbrauch) & grid portion updaten in der GUI
+    // UPDATE community pool (usage) & grid portion
     private void updatePercentageUI(String jsonResponse) {
 
         try {
@@ -183,7 +185,7 @@ public class EnergyGUIController implements Initializable{
         }
     }
 
-
+    // UPDATE historical usage
     private void updateHistoricalUI(String jsonResponse) {
         try {
             EnergyDto[] data = objectMapper.readValue(jsonResponse, EnergyDto[].class);
