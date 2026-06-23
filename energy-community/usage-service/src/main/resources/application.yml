@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: usage-service
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: disysuser
+    password: disyspw
+
+  jpa:
+    hibernate:
+      ddl-auto: none
