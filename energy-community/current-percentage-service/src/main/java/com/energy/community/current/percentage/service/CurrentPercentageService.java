@@ -22,13 +22,13 @@ public class CurrentPercentageService {
             return;
         }
         double communityDepleted = calculateCommunityDepletedPercentage(
-                usageUpdateDto.communityProduced(),
-                usageUpdateDto.communityUsed()
+                usageUpdateDto.community_produced(),
+                usageUpdateDto.community_used()
         );
 
         double gridPortion = calculateGridPortionPercentage(
-                usageUpdateDto.communityUsed(),
-                usageUpdateDto.gridUsed()
+                usageUpdateDto.community_used(),
+                usageUpdateDto.grid_used()
         );
         PercentageEntity entity = new PercentageEntity();
         entity.setHour(usageUpdateDto.hour());
