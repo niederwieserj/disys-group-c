@@ -15,7 +15,7 @@ public class RabbitMqConfig {
 
     @Bean
     public Queue producedKWh() {
-        return new Queue(PRODUCED_KWH_QUEUE, false);
+        return new Queue(PRODUCED_KWH_QUEUE, true);
     }
 
     @Bean

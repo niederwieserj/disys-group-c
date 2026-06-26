@@ -4,8 +4,12 @@ import com.energy.community.current.percentage.config.RabbitMQConfig;
 import com.energy.community.current.percentage.dto.UsageUpdateDto;
 import com.energy.community.current.percentage.entity.PercentageEntity;
 import com.energy.community.current.percentage.repository.PercentageRepository;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 
 @Service
 public class CurrentPercentageService {
@@ -17,7 +21,17 @@ public class CurrentPercentageService {
     }
 
     @RabbitListener(queues = RabbitMQConfig.USAGE_UPDATE_QUEUE)
-    public void  processUsageUpdate(UsageUpdateDto usageUpdateDto){
+    public void processUsageUpdate(String rawMessage) {
+        UsageUpdateDto usageUpdateDto;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            usageUpdateDto = mapper.readValue(rawMessage, UsageUpdateDto.class);
+        } catch (IOException e) {
+            System.out.println("Could not process usage update: " + e.getMessage());
+            return;
+        }
+
         if (usageUpdateDto == null || usageUpdateDto.hour() == null) {
             return;
         }
@@ -38,8 +52,6 @@ public class CurrentPercentageService {
         currentPercentageRepository.deleteAll();
         currentPercentageRepository.save(entity);
     }
-
-
 
 
     private double calculateCommunityDepletedPercentage(double communityProduced, double communityUsage){
