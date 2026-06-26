@@ -29,13 +29,6 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate(JacksonJsonMessageConverter messageConverter) {
-        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
-        rabbitTemplate.setMessageConverter(messageConverter);
-        return rabbitTemplate;
-    }
-
-    @Bean
     public JacksonJsonMessageConverter jsonMessageConverter() {
         JsonMapper jsonMapper = JsonMapper.builder().build();
         return new JacksonJsonMessageConverter(jsonMapper);
