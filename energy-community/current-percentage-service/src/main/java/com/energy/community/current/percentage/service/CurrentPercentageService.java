@@ -35,6 +35,7 @@ public class CurrentPercentageService {
         entity.setCommunityDepleted(communityDepleted);
         entity.setGridPortion(gridPortion);
 
+        currentPercentageRepository.deleteAll();
         currentPercentageRepository.save(entity);
     }
 
