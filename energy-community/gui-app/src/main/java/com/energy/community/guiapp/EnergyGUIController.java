@@ -128,14 +128,14 @@ public class EnergyGUIController implements Initializable{
             String responseBody = sendGetRequest(url);
             System.out.println("debug response: " + responseBody);
 
-            javafx.application.Platform.runLater(() -> {
-                if (responseBody != null) {
-                    updatePercentageUI(responseBody);
-                } else {
-                    community_pool_pc_value.setText("No data found!");
-                    grid_portion_pc_value.setText("No data found!");
-                }
-            });
+            if (responseBody != null) {
+
+                updatePercentageUI(responseBody);
+            } else {
+
+                community_pool_pc_value.setText("No data found!");
+                grid_portion_pc_value.setText("No data found!");
+            }
         });
         thread.setDaemon(true);
         thread.start();
@@ -147,17 +147,11 @@ public class EnergyGUIController implements Initializable{
         String endIso = getFormattedDateTime(end_date_picker, end_time, false);
         String url = String.format("http://localhost:8080/energy/historical?start=%s&end=%s", startIso, endIso);
 
-        Thread thread = new Thread(() -> {
-            String responseBody = sendGetRequest(url);
+        String responseBody = sendGetRequest(url);
 
-            Platform.runLater(() -> {
-                if (responseBody != null) {
-                    updateHistoricalUI(responseBody);
-                }
-            });
-        });
-        thread.setDaemon(true);
-        thread.start();
+        if (responseBody != null) {
+            updateHistoricalUI(responseBody);
+        }
     }
 
     private String getFormattedDateTime(DatePicker datePicker, TextField timeField, boolean isStart) {
