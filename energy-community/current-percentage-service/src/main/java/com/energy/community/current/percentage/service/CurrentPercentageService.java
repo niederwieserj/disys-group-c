@@ -32,8 +32,8 @@ public class CurrentPercentageService {
         );
         PercentageEntity entity = new PercentageEntity();
         entity.setHour(usageUpdateDto.hour());
-        entity.setCommunityDepleted(communityDepleted);
-        entity.setGridPortion(gridPortion);
+        entity.setCommunityDepleted(round(communityDepleted));
+        entity.setGridPortion(round(gridPortion));
 
         currentPercentageRepository.deleteAll();
         currentPercentageRepository.save(entity);
@@ -58,6 +58,9 @@ public class CurrentPercentageService {
         double gridPortion = (gridUsage / totalUsage) * 100;
         return  gridPortion;
 
+    }
 
+    private double round(double value){
+        return Math.round(value*100)/100;
     }
 }
