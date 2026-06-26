@@ -1,19 +1,30 @@
-package com.energy.community.current.percentage.config;
+package com.energy.community.usage.config;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
-public class RabbitMQConfig {
+public class RabbitMqConfig {
+
+    public static final String PRODUCED_KWH_QUEUE = "producedKwh";
+    public static final String USED_KWH_QUEUE = "usedKwh";
     public static final String USAGE_UPDATE_QUEUE = "Usage_Update_Queue";
     public static final String RABBITMQ_USERNAME = "guest";
     public static final String RABBITMQ_PASSWORD = "guest";
+
+    @Bean
+    public Queue producedKwhQueue() {
+        return new Queue(PRODUCED_KWH_QUEUE, true);
+    }
+
+    @Bean
+    public Queue usedKwhQueue() {
+        return new Queue(USED_KWH_QUEUE, true);
+    }
 
     @Bean
     public Queue usageUpdateQueue() {
@@ -29,9 +40,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public JacksonJsonMessageConverter jsonMessageConverter() {
-        JsonMapper jsonMapper = JsonMapper.builder().build();
-        return new JacksonJsonMessageConverter(jsonMapper);
+    public RabbitTemplate rabbitTemplate() {
+        return new RabbitTemplate(connectionFactory());
     }
-
 }
