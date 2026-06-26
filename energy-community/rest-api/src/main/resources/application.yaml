@@ -9,3 +9,6 @@ spring:
       url: jdbc:postgresql://localhost:5432/postgres
       username: disysuser
       password: disyspw
+    flyway:
+        enabled: true
+        baseline-on-migrate: true

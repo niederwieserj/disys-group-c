@@ -22,19 +22,20 @@ public class CurrentPercentageService {
             return;
         }
         double communityDepleted = calculateCommunityDepletedPercentage(
-                usageUpdateDto.communityProduced(),
-                usageUpdateDto.communityUsed()
+                usageUpdateDto.community_produced(),
+                usageUpdateDto.community_used()
         );
 
         double gridPortion = calculateGridPortionPercentage(
-                usageUpdateDto.communityUsed(),
-                usageUpdateDto.gridUsed()
+                usageUpdateDto.community_used(),
+                usageUpdateDto.grid_used()
         );
         PercentageEntity entity = new PercentageEntity();
         entity.setHour(usageUpdateDto.hour());
-        entity.setCommunityDepleted(communityDepleted);
-        entity.setGridPortion(gridPortion);
+        entity.setCommunityDepleted(round(communityDepleted));
+        entity.setGridPortion(round(gridPortion));
 
+        currentPercentageRepository.deleteAll();
         currentPercentageRepository.save(entity);
     }
 
@@ -57,6 +58,9 @@ public class CurrentPercentageService {
         double gridPortion = (gridUsage / totalUsage) * 100;
         return  gridPortion;
 
+    }
 
+    private double round(double value){
+        return Math.round(value*100)/100;
     }
 }
