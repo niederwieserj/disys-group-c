@@ -18,12 +18,12 @@ public class RabbitMqConfig {
 
     @Bean
     public Queue producedKwhQueue() {
-        return new Queue(PRODUCED_KWH_QUEUE, false);
+        return new Queue(PRODUCED_KWH_QUEUE, true);
     }
 
     @Bean
     public Queue usedKwhQueue() {
-        return new Queue(USED_KWH_QUEUE, false);
+        return new Queue(USED_KWH_QUEUE, true);
     }
 
     @Bean
