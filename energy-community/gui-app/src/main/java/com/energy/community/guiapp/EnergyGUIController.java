@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 
 public class EnergyGUIController implements Initializable{
 
@@ -123,16 +124,21 @@ public class EnergyGUIController implements Initializable{
     // GET current percentages
     private void getCurrentPercentageData() {
         String url = "http://localhost:8080/energy/current";
-        String responseBody = sendGetRequest(url);
+        Thread thread = new Thread(() -> {
+            String responseBody = sendGetRequest(url);
+            System.out.println("debug response: " + responseBody);
 
-        if (responseBody != null) {
+            if (responseBody != null) {
 
-            updatePercentageUI(responseBody);
-        } else {
+                updatePercentageUI(responseBody);
+            } else {
 
-            community_pool_pc_value.setText("No data found!");
-            grid_used_kWh_value.setText("No data found!");
-        }
+                community_pool_pc_value.setText("No data found!");
+                grid_portion_pc_value.setText("No data found!");
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     // GET historical energy data
@@ -144,13 +150,12 @@ public class EnergyGUIController implements Initializable{
         String responseBody = sendGetRequest(url);
 
         if (responseBody != null) {
-
             updateHistoricalUI(responseBody);
         }
     }
 
     private String getFormattedDateTime(DatePicker datePicker, TextField timeField, boolean isStart) {
-       LocalDate date = (datePicker.getValue() != null) ? datePicker.getValue() :
+        LocalDate date = (datePicker.getValue() != null) ? datePicker.getValue() :
                 (isStart ? LocalDate.now().minusDays(1) : LocalDate.now());
         LocalTime time;
         try {
