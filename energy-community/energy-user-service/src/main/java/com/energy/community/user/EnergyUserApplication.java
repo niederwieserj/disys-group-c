@@ -36,14 +36,19 @@ public class EnergyUserApplication {
         SpringApplication.run(EnergyUserApplication.class, args);
     }
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedDelay = 1000)
     private void sendUsageMessage() {
+        try {
+            Thread.sleep(ThreadLocalRandom.current().nextLong(0, 4001));
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            return;
+        }
         UsedKwhDto usedKwhDto = new UsedKwhDto(
                 "USER",
                 "COMMUNITY",
                 usageGenerator.generateKwhForCurrentTime(),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
 
         try {
             String json = objectMapper.writeValueAsString(usedKwhDto);
@@ -52,9 +57,5 @@ public class EnergyUserApplication {
         } catch (JsonProcessingException exception) {
             System.out.println("Could not serialize usage message: " + exception.getMessage());
         }
-    }
-
-    private long randomDelayInMilliseconds() {
-        return ThreadLocalRandom.current().nextLong(1000, 5001);
     }
 }
