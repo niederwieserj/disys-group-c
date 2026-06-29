@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CurrentPercentageService" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="current-percentage-service" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.energy.community.current.percentage.CurrentPercentageApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

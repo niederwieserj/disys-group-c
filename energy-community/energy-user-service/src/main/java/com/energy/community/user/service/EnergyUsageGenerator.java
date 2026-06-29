@@ -1,4 +1,4 @@
-package com.energy.community.user;
+package com.energy.community.user.service;
 
 import org.springframework.stereotype.Component;
 

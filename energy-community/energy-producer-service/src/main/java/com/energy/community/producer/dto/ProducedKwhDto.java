@@ -1,4 +1,4 @@
-package com.energy.community.producer;
+package com.energy.community.producer.dto;
 
 import java.time.LocalDateTime;
 

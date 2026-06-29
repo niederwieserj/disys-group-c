@@ -124,45 +124,62 @@ public class EnergyGUIController implements Initializable{
     // GET current percentages
     private void getCurrentPercentageData() {
         String url = "http://localhost:8080/energy/current";
-        Thread thread = new Thread(() -> {
+
             String responseBody = sendGetRequest(url);
-            System.out.println("debug response: " + responseBody);
+            //System.out.println("debug response: " + responseBody);
 
             if (responseBody != null) {
 
                 updatePercentageUI(responseBody);
             } else {
-
-                community_pool_pc_value.setText("No data found!");
-                grid_portion_pc_value.setText("No data found!");
+                community_pool_pc_value.setText("Could not reach server!");
+                grid_portion_pc_value.setText("Could not reach server!");
             }
-        });
-        thread.setDaemon(true);
-        thread.start();
+
     }
 
     // GET historical energy data
     private void getHistoricalEnergyData() {
         String startIso = getFormattedDateTime(start_date_picker, start_time, true);
+        if (startIso == null) return;
+
         String endIso = getFormattedDateTime(end_date_picker, end_time, false);
+        if (endIso == null) return;
+
+
         String url = String.format("http://localhost:8080/energy/historical?start=%s&end=%s", startIso, endIso);
 
         String responseBody = sendGetRequest(url);
 
         if (responseBody != null) {
             updateHistoricalUI(responseBody);
+        } else{
+
+            community_produced_kWh_value.setText("Could not reach server!");
+            community_used_kWh_value.setText("Could not reach server!");
+            grid_used_kWh_value.setText("Could not reach server!");
         }
     }
 
     private String getFormattedDateTime(DatePicker datePicker, TextField timeField, boolean isStart) {
-        LocalDate date = (datePicker.getValue() != null) ? datePicker.getValue() :
-                (isStart ? LocalDate.now().minusDays(1) : LocalDate.now());
+        LocalDate date = datePicker.getValue();
+         String timeFieldText = timeField.getText();
+        if ((timeFieldText == null || timeFieldText.isBlank()) || (date == null)){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Input Required");
+            alert.setHeaderText(null);
+            alert.setContentText("Select valid date & time");
+            alert.showAndWait();
+            return null;
+        }
+
         LocalTime time;
         try {
-            time = LocalTime.parse(timeField.getText());
+            time = LocalTime.parse(timeFieldText);
         } catch (Exception e) {
-            time = LocalTime.MIDNIGHT;
+            return null;
         }
+
         return LocalDateTime.of(date, time).toString();
     }
 
@@ -177,6 +194,9 @@ public class EnergyGUIController implements Initializable{
 
                 community_pool_pc_value.setText(String.format("%.2f %%", latestData.community_depleted()));
                 grid_portion_pc_value.setText(String.format("%.2f %%", latestData.grid_portion()));
+            } else{
+                community_pool_pc_value.setText("No data found for current hour!");
+                grid_portion_pc_value.setText("");
             }
         } catch (Exception e) {
             System.err.println("Failed to parse percentage JSON: " + e.getMessage());
