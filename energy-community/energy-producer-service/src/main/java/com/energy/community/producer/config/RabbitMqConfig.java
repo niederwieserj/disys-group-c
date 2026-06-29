@@ -1,4 +1,4 @@
-package com.energy.community.producer;
+package com.energy.community.producer.config;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
