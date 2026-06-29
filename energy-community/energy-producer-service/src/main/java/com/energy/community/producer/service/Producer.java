@@ -1,5 +1,7 @@
-package com.energy.community.producer;
+package com.energy.community.producer.service;
 
+import com.energy.community.producer.config.RabbitMqConfig;
+import com.energy.community.producer.dto.ProducedKwhDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -17,16 +19,16 @@ import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 
 @Component
-public class Worker {
+public class Producer {
     private final RabbitTemplate rabbitTemplate;
     private JsonNode weatherInfo = null;
 
-    public Worker(RabbitTemplate rabbitTemplate) {
+    public Producer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    @Scheduled(fixedRate = 60000)
-    public void Work() {
+    @Scheduled(fixedRate = 5000) // Send in 5 sec interval to simulate several producers
+    public void Produce() {
         if (weatherInfo == null) {
             return;
         }

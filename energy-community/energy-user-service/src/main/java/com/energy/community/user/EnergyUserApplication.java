@@ -1,19 +1,24 @@
 package com.energy.community.user;
 
+import com.energy.community.user.config.RabbitMqConfig;
+import com.energy.community.user.dto.UsedKwhDto;
+import com.energy.community.user.service.EnergyUsageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SpringBootApplication
-public class EnergyUserApplication implements CommandLineRunner {
+@EnableScheduling
+public class EnergyUserApplication {
 
     private final RabbitTemplate rabbitTemplate;
     private final EnergyUsageGenerator usageGenerator;
@@ -31,18 +36,7 @@ public class EnergyUserApplication implements CommandLineRunner {
         SpringApplication.run(EnergyUserApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) {
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
-                sendUsageMessage();
-                Thread.sleep(randomDelayInMilliseconds());
-            } catch (InterruptedException exception) {
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
+    @Scheduled(fixedRate = 5000)
     private void sendUsageMessage() {
         UsedKwhDto usedKwhDto = new UsedKwhDto(
                 "USER",
