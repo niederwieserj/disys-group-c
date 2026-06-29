@@ -10,9 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.transaction.Transactional;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -109,20 +106,19 @@ public class UsageService {
     }
 
     private void sendUsageUpdate(EnergyEntity entity) throws JsonProcessingException {
-        UsageUpdateDto usageUpdateDto = new UsageUpdateDto(
-                entity.getHour(),
-                entity.getCommunityProduced(),
-                entity.getCommunityUsed(),
-                entity.getGridUsed()
-        );
+    UsageUpdateDto usageUpdateDto = new UsageUpdateDto(
+            entity.getHour(),
+            entity.getCommunityProduced(),
+            entity.getCommunityUsed(),
+            entity.getGridUsed()
+    );
 
-        byte[] body = objectMapper.writeValueAsBytes(usageUpdateDto);
-        Message message = MessageBuilder.withBody(body)
-                .setContentType(MessageProperties.CONTENT_TYPE_JSON)
-                .build();
+    String json = objectMapper.writeValueAsString(usageUpdateDto);
 
-        rabbitTemplate.send(RabbitMqConfig.USAGE_UPDATE_QUEUE, message);
-    }
+    rabbitTemplate.convertAndSend(RabbitMqConfig.USAGE_UPDATE_QUEUE, json);
+
+    System.out.println("Sent usage update: " + json);
+}
 
     private double roundToThreeDecimals(double value) {
         return Math.round(value * 1000.0) / 1000.0;
