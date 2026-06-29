@@ -22,6 +22,17 @@ import java.time.LocalDateTime;
 public class Producer {
     private final RabbitTemplate rabbitTemplate;
     private JsonNode weatherInfo = null;
+    private final double PV_PLANT_PEAK_KW = 10.0; // Assuming 50 sqm of roof area
+    private final int SECONDS_IN_HOUR = 3600;
+    private final int MINUTES_IN_HOUR = 60;
+    private final String WEATHER_API_BASE_URL = "https://api.open-meteo.com/v1/forecast?";
+    private final String WEATHER_API_PARAMETERS = String.join("&",
+            "latitude=48.2",
+            "longitude=16.37",
+            "hourly=sunshine_duration",
+            "forecast_days=1",
+            "temporal_resolution=native",
+            "models=geosphere_arome_austria");
 
     public Producer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
@@ -36,11 +47,9 @@ public class Producer {
         int hour = LocalDateTime.now().getHour();
         double sunshineSecondsInHour = Double.parseDouble(weatherInfo.path("hourly").path("sunshine_duration").get(hour).toString());
 
-        double kiloWattPeak = 10.0; // Assuming 50 sqm of roof area
-        int secondsInHour = 3600;
-        int minutesInHour = 60;
-        double currentkiloWatt = (sunshineSecondsInHour / secondsInHour) * kiloWattPeak;
-        double kiloWattHoursPerMinute = currentkiloWatt / minutesInHour;
+        double currentkiloWatt = (sunshineSecondsInHour / SECONDS_IN_HOUR) * PV_PLANT_PEAK_KW;
+        double kiloWattHoursPerMinute = currentkiloWatt / MINUTES_IN_HOUR;
+        kiloWattHoursPerMinute *= 0.8 + (Math.random() * 0.4); // Add some noise (multiply with number between 0.8 and 1.2)
 
         if (kiloWattHoursPerMinute < 0) {
             kiloWattHoursPerMinute = 0;
@@ -71,7 +80,7 @@ public class Producer {
     public void GetWeatherFromApi() {
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create("https://api.open-meteo.com/v1/forecast?latitude=48.2&longitude=16.37&hourly=sunshine_duration&forecast_days=1&temporal_resolution=native&models=geosphere_arome_austria"))
+                .uri(URI.create(WEATHER_API_BASE_URL + WEATHER_API_PARAMETERS))
                 .build();
 
         HttpResponse<String> response = null;
