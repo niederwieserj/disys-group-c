@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="EnergyProducer" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="energy-producer-service" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="com.energy.community.producer.ProducerApplication" />
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
-  </configuration>
-</component>
