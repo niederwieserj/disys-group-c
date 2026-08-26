@@ -1,4 +1,4 @@
-package com.energy.community.guiapp.presentationModel;
+package com.energy.community.guiapp.model;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;

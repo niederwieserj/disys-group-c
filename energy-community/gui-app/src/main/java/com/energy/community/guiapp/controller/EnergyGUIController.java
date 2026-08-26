@@ -1,8 +1,8 @@
-package com.energy.community.guiapp;
+package com.energy.community.guiapp.controller;
 
 import com.energy.community.guiapp.dto.EnergyDto;
 import com.energy.community.guiapp.dto.PercentageDto;
-import com.energy.community.guiapp.presentationModel.EnergyCommunityModel;
+import com.energy.community.guiapp.model.EnergyCommunityModel;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.fxml.Initializable;
 import javafx.event.ActionEvent;
