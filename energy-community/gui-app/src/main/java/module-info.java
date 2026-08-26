@@ -13,4 +13,6 @@ module com.energy.community.guiapp {
     exports com.energy.community.guiapp.dto to com.fasterxml.jackson.databind;
     opens com.energy.community.guiapp.dto to com.fasterxml.jackson.databind;
     exports com.energy.community.guiapp;
+
+    opens com.energy.community.guiapp.controller to javafx.fxml;
 }
