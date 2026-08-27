@@ -1,7 +1,4 @@
 spring:
-  application:
-    name: energy-user-service
-
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
