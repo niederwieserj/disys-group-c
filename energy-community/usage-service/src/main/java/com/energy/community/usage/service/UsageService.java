@@ -132,6 +132,7 @@ public class UsageService {
                     )
             );
 
+            reallocateGridUsageToCommunity(entity);
             return;
         }
 
@@ -160,6 +161,39 @@ public class UsageService {
                 roundToThreeDecimals(
                         entity.getGridUsed()
                                 + gridUsage
+                )
+        );
+    }
+
+    private void reallocateGridUsageToCommunity(
+            EnergyEntity entity
+    ) {
+        double availableCommunityEnergy = Math.max(
+                0,
+                entity.getCommunityProduced()
+                        - entity.getCommunityUsed()
+        );
+
+        double reallocatedEnergy = Math.min(
+                entity.getGridUsed(),
+                availableCommunityEnergy
+        );
+
+        if (reallocatedEnergy <= 0) {
+            return;
+        }
+
+        entity.setCommunityUsed(
+                roundToThreeDecimals(
+                        entity.getCommunityUsed()
+                                + reallocatedEnergy
+                )
+        );
+
+        entity.setGridUsed(
+                roundToThreeDecimals(
+                        entity.getGridUsed()
+                                - reallocatedEnergy
                 )
         );
     }

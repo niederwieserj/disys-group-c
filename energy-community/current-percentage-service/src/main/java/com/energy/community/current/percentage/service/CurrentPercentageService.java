@@ -32,18 +32,15 @@ public class CurrentPercentageService {
         try {
             UsageUpdateDto usageUpdate = objectMapper.readValue(
                     rawMessage,
-                    UsageUpdateDto.class
-            );
+                    UsageUpdateDto.class);
 
             if (!isValid(usageUpdate)) {
                 return;
             }
 
-            LocalDateTime messageHour =
-                    usageUpdate.hour().truncatedTo(ChronoUnit.HOURS);
+            LocalDateTime messageHour = usageUpdate.hour().truncatedTo(ChronoUnit.HOURS);
 
-            LocalDateTime currentHour =
-                    LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
+            LocalDateTime currentHour = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
 
             if (!messageHour.equals(currentHour)) {
                 return;
@@ -57,24 +54,19 @@ public class CurrentPercentageService {
             entity.setCommunityDepleted(
                     calculateCommunityDepletedPercentage(
                             usageUpdate.community_produced(),
-                            usageUpdate.community_used()
-                    )
-            );
+                            usageUpdate.community_used()));
 
             entity.setGridPortion(
                     calculateGridPortionPercentage(
                             usageUpdate.community_used(),
-                            usageUpdate.grid_used()
-                    )
-            );
+                            usageUpdate.grid_used()));
 
             percentageRepository.save(entity);
 
         } catch (IOException exception) {
             System.out.println(
                     "Could not process usage update: "
-                            + exception.getMessage()
-            );
+                            + exception.getMessage());
         }
     }
 
@@ -87,18 +79,15 @@ public class CurrentPercentageService {
     }
 
     private void removeOutdatedPercentages(LocalDateTime currentHour) {
-        List<PercentageEntity> outdatedPercentages =
-                percentageRepository.findByHourNot(currentHour);
+        List<PercentageEntity> outdatedPercentages = percentageRepository.findByHourNot(currentHour);
 
-        if (!outdatedPercentages.isEmpty()) {
-            percentageRepository.deleteAll(outdatedPercentages);
-        }
+        outdatedPercentages.forEach(
+                percentageRepository::delete);
     }
 
     private double calculateCommunityDepletedPercentage(
             double communityProduced,
-            double communityUsed
-    ) {
+            double communityUsed) {
         if (communityProduced == 0) {
             return 0;
         }
@@ -108,8 +97,7 @@ public class CurrentPercentageService {
 
     private double calculateGridPortionPercentage(
             double communityUsed,
-            double gridUsed
-    ) {
+            double gridUsed) {
         double totalUsage = communityUsed + gridUsed;
 
         if (totalUsage == 0) {
