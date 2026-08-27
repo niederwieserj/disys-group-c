@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -30,95 +29,167 @@ public class UsageService {
     private final RabbitTemplate rabbitTemplate;
     private final ObjectMapper objectMapper;
 
-    public UsageService(EnergyRepository energyRepository,
-                        EnergyMessageParser energyMessageParser,
-                        RabbitTemplate rabbitTemplate) {
+    public UsageService(
+            EnergyRepository energyRepository,
+            EnergyMessageParser energyMessageParser,
+            RabbitTemplate rabbitTemplate
+    ) {
         this.energyRepository = energyRepository;
         this.energyMessageParser = energyMessageParser;
         this.rabbitTemplate = rabbitTemplate;
+
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
-        this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        this.objectMapper.disable(
+                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
+        );
     }
 
     @RabbitListener(queues = RabbitMqConfig.PRODUCED_KWH_QUEUE)
-    @Transactional
     public void processProducedKwhMessage(String message) {
         processEnergyMessage(message);
     }
 
     @RabbitListener(queues = RabbitMqConfig.USED_KWH_QUEUE)
-    @Transactional
     public void processUsedKwhMessage(String message) {
         processEnergyMessage(message);
     }
 
-    public void processEnergyMessage(String rawMessage) {
+    public synchronized void processEnergyMessage(String rawMessage) {
         try {
-            EnergyMessageDto message = energyMessageParser.parse(rawMessage);
+            EnergyMessageDto message =
+                    energyMessageParser.parse(rawMessage);
+
             if (!isValidCommunityMessage(message)) {
                 return;
             }
 
-            EnergyEntity entity = getOrCreateHourlyEntity(message.timestamp());
+            EnergyEntity entity =
+                    getOrCreateHourlyEntity(message.datetime());
+
             applyMessageToHourlyUsage(entity, message);
-            EnergyEntity savedEntity = energyRepository.save(entity);
+
+            EnergyEntity savedEntity =
+                    energyRepository.save(entity);
+
             sendUsageUpdate(savedEntity);
+
         } catch (IOException | RuntimeException exception) {
-            System.out.println("Could not process energy message: " + exception.getMessage());
+            System.err.println(
+                    "Could not process energy message: "
+                            + exception.getMessage()
+            );
         }
     }
 
-    private boolean isValidCommunityMessage(EnergyMessageDto message) {
-        if (message.timestamp() == null || message.kwh() <= 0) {
+    private boolean isValidCommunityMessage(
+            EnergyMessageDto message
+    ) {
+        if (message.datetime() == null || message.kwh() <= 0) {
             return false;
         }
+
         return COMMUNITY.equalsIgnoreCase(message.association())
-                && (PRODUCER.equalsIgnoreCase(message.type()) || USER.equalsIgnoreCase(message.type()));
+                && (
+                PRODUCER.equalsIgnoreCase(message.type())
+                        || USER.equalsIgnoreCase(message.type())
+        );
     }
 
-    private EnergyEntity getOrCreateHourlyEntity(LocalDateTime timestamp) {
-        LocalDateTime hour = timestamp.truncatedTo(ChronoUnit.HOURS);
-        return energyRepository.findByHour(hour).orElseGet(() -> createHourlyEntity(hour));
+    private EnergyEntity getOrCreateHourlyEntity(
+            LocalDateTime datetime
+    ) {
+        LocalDateTime hour =
+                datetime.truncatedTo(ChronoUnit.HOURS);
+
+        return energyRepository
+                .findByHour(hour)
+                .orElseGet(() -> createHourlyEntity(hour));
     }
 
-    private EnergyEntity createHourlyEntity(LocalDateTime hour) {
+    private EnergyEntity createHourlyEntity(
+            LocalDateTime hour
+    ) {
         EnergyEntity entity = new EnergyEntity();
+
         entity.setHour(hour);
         entity.setCommunityProduced(0);
         entity.setCommunityUsed(0);
         entity.setGridUsed(0);
+
         return entity;
     }
 
-    private void applyMessageToHourlyUsage(EnergyEntity entity, EnergyMessageDto message) {
+    private void applyMessageToHourlyUsage(
+            EnergyEntity entity,
+            EnergyMessageDto message
+    ) {
         if (PRODUCER.equalsIgnoreCase(message.type())) {
-            entity.setCommunityProduced(roundToThreeDecimals(entity.getCommunityProduced() + message.kwh()));
+            entity.setCommunityProduced(
+                    roundToThreeDecimals(
+                            entity.getCommunityProduced()
+                                    + message.kwh()
+                    )
+            );
+
             return;
         }
 
-        double availableCommunityEnergy = Math.max(0, entity.getCommunityProduced() - entity.getCommunityUsed());
-        double communityUsage = Math.min(message.kwh(), availableCommunityEnergy);
-        double gridUsage = message.kwh() - communityUsage;
+        double availableCommunityEnergy = Math.max(
+                0,
+                entity.getCommunityProduced()
+                        - entity.getCommunityUsed()
+        );
 
-        entity.setCommunityUsed(roundToThreeDecimals(entity.getCommunityUsed() + communityUsage));
-        entity.setGridUsed(roundToThreeDecimals(entity.getGridUsed() + gridUsage));
+        double communityUsage = Math.min(
+                message.kwh(),
+                availableCommunityEnergy
+        );
+
+        double gridUsage =
+                message.kwh() - communityUsage;
+
+        entity.setCommunityUsed(
+                roundToThreeDecimals(
+                        entity.getCommunityUsed()
+                                + communityUsage
+                )
+        );
+
+        entity.setGridUsed(
+                roundToThreeDecimals(
+                        entity.getGridUsed()
+                                + gridUsage
+                )
+        );
     }
 
-    private void sendUsageUpdate(EnergyEntity entity) throws JsonProcessingException {
-    UsageUpdateDto usageUpdateDto = new UsageUpdateDto(
-            entity.getHour(),
-            entity.getCommunityProduced(),
-            entity.getCommunityUsed(),
-            entity.getGridUsed()
-    );
+    private void sendUsageUpdate(
+            EnergyEntity entity
+    ) throws JsonProcessingException {
 
-    String json = objectMapper.writeValueAsString(usageUpdateDto);
+        UsageUpdateDto usageUpdateDto =
+                new UsageUpdateDto(
+                        entity.getHour(),
+                        entity.getCommunityProduced(),
+                        entity.getCommunityUsed(),
+                        entity.getGridUsed()
+                );
 
-    rabbitTemplate.convertAndSend(RabbitMqConfig.USAGE_UPDATE_QUEUE, json);
+        String json =
+                objectMapper.writeValueAsString(
+                        usageUpdateDto
+                );
 
-    System.out.println("Sent usage update: " + json);
-}
+        rabbitTemplate.convertAndSend(
+                RabbitMqConfig.USAGE_UPDATE_QUEUE,
+                json
+        );
+
+        System.out.println(
+                "Sent usage update: " + json
+        );
+    }
 
     private double roundToThreeDecimals(double value) {
         return Math.round(value * 1000.0) / 1000.0;
