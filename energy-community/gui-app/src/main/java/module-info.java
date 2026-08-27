@@ -1,12 +1,12 @@
 module com.energy.community.guiapp {
     requires javafx.controls;
+    requires transitive javafx.graphics;
     requires javafx.fxml;
 
     requires org.kordamp.bootstrapfx.core;
     requires java.net.http;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
-
 
     opens com.energy.community.guiapp to javafx.fxml;
 
